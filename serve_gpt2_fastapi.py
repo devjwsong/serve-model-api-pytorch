@@ -59,7 +59,7 @@ class Inferencer():
         self.chat_history[user_id].append((speaker_id, message))
 
     # A single prediction.
-    def predict(self, user_id):
+    async def predict(self, user_id):
         input_hists = []
         for tup in self.chat_history[user_id]:
             token_ids = [self.sp1_id if tup[0] == 1 else self.sp2_id] + self.tokenizer.encode(tup[1])
@@ -105,14 +105,14 @@ def index():
 
 # Posting one user message.
 @app.post("/infer")
-def infer(data: TextInput):
+async def infer(data: TextInput):
     data = data.dict()
 
     user_id = data['user_id']
     message = data['message']
 
     inferencer.add_message(user_id, 1, message)
-    response = inferencer.predict(user_id)
+    response = await inferencer.predict(user_id)
 
     return {'message': response}
 
